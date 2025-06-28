@@ -1,0 +1,35 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+variables:
+  TF_VERSION: '1.5.6'
+  ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+  ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+  ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+  ARM_TENANT_ID: $(ARM_TENANT_ID)
+
+
+steps:
+  - task: UseTerraform@0
+    inputs:
+      terraformVersion: $(TF_VERSION)
+
+  - task: Checkout@1
+
+  - script: terraform init
+    displayName: 'Terraform Init'
+
+  - script: terraform validate
+    displayName: 'Terraform Validate'
+
+  - script: terraform plan -out=tfplan
+    displayName: 'Terraform Plan'
+
+  - script: terraform apply -auto-approve tfplan
+    displayName: 'Terraform Apply'

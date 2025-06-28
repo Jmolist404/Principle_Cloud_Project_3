@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mi Perfil</title>
+</head>
+<body>
+    <h1>Perfil de {{ user.get('name', 'Usuario') }}</h1>
+    <p>Correo: {{ user.get('preferred_username', 'No disponible') }}</p>
+
+    <nav>
+        <a href="{{ url_for('home') }}"><button>Inicio</button></a>
+        <a href="{{ url_for('index') }}"><button>Documentos</button></a>
+    </nav>
+
+    <p><a href="{{ url_for('logout') }}">Cerrar sesión</a></p>
+</body>
+</html>
+
