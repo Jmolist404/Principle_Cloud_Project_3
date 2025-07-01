@@ -1,32 +1,37 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
 from azure.storage.blob import BlobServiceClient
 from msal import ConfidentialClientApplication
 
 from io import BytesIO
-from flask import send_file
 import os
 
 app = Flask(__name__)
-app.secret_key = 'FlaskAppSecret_2'  # reemplazá por algo más seguro en producción
+app.secret_key = 'FlaskAppSecret_2'
 
-# 🔐 Configuración de Azure AD
-TENANT_ID =  "bff06d89-48f9-41a6-b2e3-8910cfe1f722"
+# 🔐 Azure AD config
+TENANT_ID = "bff06d89-48f9-41a6-b2e3-8910cfe1f722"
 CLIENT_ID = "119bbec8-fcfb-44dd-a211-33ce892cbfe1"
 CLIENT_SECRET = "lOT8Q~bYdojiEEEnWgi.F7dysdIzNgGktsKgtcUh"
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_URI = "http://localhost:5000/getAToken"
 SCOPE = ["User.Read"]
 
-# Configuración Azure
-AZURE_CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=principlescloudproject;AccountKey=9tzksc8EDnHh3QOQhBNq69Q76NmtEQ1g720VZBj492fvQOoj94gDzjGTXcgW+IoBPU9TlVz1ihSg+AStboHatQ==;EndpointSuffix=core.windows.net'
+# 🔐 Azure Key Vault
+VAULT_URL =  "https://pcloudkeyvaluejm25.vault.azure.net/"  # << CAMBIÁ esto
+
+credential = DefaultAzureCredential()
+secret_client = SecretClient(vault_url=VAULT_URL, credential=credential)
+
+# ⛅ Blob Storage usando secreto de Key Vault
+AZURE_CONNECTION_STRING = secret_client.get_secret("AzureBlobConnectionString").value
 CONTAINER_NAME = 'uploads'
+
 blob_service_client = BlobServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
 container_client = blob_service_client.get_container_client(CONTAINER_NAME)
 
-
-
-# 🔐 MSAL client
+# 🔐 MSAL App
 msal_app = ConfidentialClientApplication(
     CLIENT_ID, authority=AUTHORITY,
     client_credential=CLIENT_SECRET
@@ -39,6 +44,7 @@ def index():
     blobs = container_client.list_blobs()
     files = [blob.name for blob in blobs]
     return render_template('home.html', files=files, user=session['user'])
+
 @app.route('/home')
 def home():
     if 'user' not in session:
@@ -64,7 +70,6 @@ def upload():
             return redirect(url_for('mydocuments'))
     return render_template('upload.html', user=session["user"]["name"])
 
-
 @app.route("/login")
 def login():
     auth_url = msal_app.get_authorization_request_url(SCOPE, redirect_uri=REDIRECT_URI)
@@ -82,23 +87,14 @@ def authorized():
             "name": result["id_token_claims"]["name"],
             "preferred_username": result["id_token_claims"]["preferred_username"]
         }
-        return redirect(url_for("home"))  # 👈 Ahora va a /home
+        return redirect(url_for("home"))
     return f"Login failed: {result.get('error_description')}", 400
-
 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("https://login.microsoftonline.com/common/oauth2/v2.0/logout" +
                     "?post_logout_redirect_uri=http://localhost:5000/")
-
-
-
-@app.route('/home')
-def ahome():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('home.html', user=session['user'])
 
 @app.route('/mydocuments')
 def mydocuments():
@@ -114,7 +110,6 @@ def mydocuments():
 
     return render_template('mydocuments.html', user=session['user'], blobs=blobs)
 
-
 @app.route('/news')
 def news():
     if 'user' not in session:
@@ -127,7 +122,6 @@ def about():
         return redirect(url_for('login'))
     return render_template('about.html', user=session['user'])
 
-
 @app.route('/download/<path:blob_name>')
 def download_blob(blob_name):
     if 'user' not in session:
@@ -137,11 +131,9 @@ def download_blob(blob_name):
     stream = blob_client.download_blob()
     file_data = stream.readall()
 
-    return send_file(BytesIO(file_data), 
-                     download_name=blob_name.split('/')[-1], 
+    return send_file(BytesIO(file_data),
+                     download_name=blob_name.split('/')[-1],
                      as_attachment=True)
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
