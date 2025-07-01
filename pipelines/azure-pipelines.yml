@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: 'Azure for Students'
+  azureSubscription: 'AzureforStudents'
   appName: 'rg-flask-app-app'
   resourceGroup: 'rg-flask-app'
 
