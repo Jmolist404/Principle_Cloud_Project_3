@@ -5,9 +5,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: 'AzureforStudents'
-  appName: 'rg-flask-app-app'
-  resourceGroup: 'rg-flask-app'
+  azureSubscription: 'AzureForStudents'
+  appName: 'myappservice1234-jmb'
+  resourceGroup: 'rg-myapp'
 
 steps:
 - task: UsePythonVersion@0
