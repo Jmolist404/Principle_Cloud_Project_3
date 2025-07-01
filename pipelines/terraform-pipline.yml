@@ -1,35 +1,39 @@
+# Este pipeline se ejecuta automáticamente cada vez que hacemos push a la rama main
 trigger:
   branches:
     include:
       - main
 
+# Usamos una máquina virtual con Ubuntu para correr los comandos
 pool:
   vmImage: 'ubuntu-latest'
 
+# Variables que usamos en el pipeline
 variables:
-variables:
-  TF_VERSION: '1.5.6'
-  ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-  ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-  ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-  ARM_TENANT_ID: $(ARM_TENANT_ID)
+  TF_VERSION: '1.5.6'  # Versión de Terraform
 
-
+# Pasos del pipeline
 steps:
+  # Usamos la extensión oficial de Terraform en Azure DevOps
   - task: UseTerraform@0
     inputs:
       terraformVersion: $(TF_VERSION)
 
+  # Clonamos el repositorio para tener acceso al código
   - task: Checkout@1
 
+  # Inicializamos Terraform (descarga plugins y prepara backend)
   - script: terraform init
     displayName: 'Terraform Init'
 
+  # Validamos que los archivos .tf estén bien escritos
   - script: terraform validate
     displayName: 'Terraform Validate'
 
+  # Creamos el plan de ejecución y lo guardamos en un archivo
   - script: terraform plan -out=tfplan
     displayName: 'Terraform Plan'
 
+  # Aplicamos el plan de Terraform para crear los recursos en Azure
   - script: terraform apply -auto-approve tfplan
     displayName: 'Terraform Apply'
