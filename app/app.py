@@ -15,7 +15,7 @@ TENANT_ID = "bff06d89-48f9-41a6-b2e3-8910cfe1f722"
 CLIENT_ID = "119bbec8-fcfb-44dd-a211-33ce892cbfe1"
 CLIENT_SECRET = "lOT8Q~bYdojiEEEnWgi.F7dysdIzNgGktsKgtcUh"
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
-REDIRECT_URI = "http://localhost:5000/getAToken"
+REDIRECT_URI = "https://myappservice1234-jmb.azurewebsites.net/getAToken"
 SCOPE = ["User.Read"]
 
 # Key Vault
