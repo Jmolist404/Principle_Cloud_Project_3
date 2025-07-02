@@ -13,11 +13,6 @@ from msal import ConfidentialClientApplication
 # Logging
 logging.basicConfig(level=logging.DEBUG)
 
-
-@app.route('/ping')
-def ping():
-    return "pong"
-
 # Flask App
 app = Flask(__name__)
 app.secret_key = 'FlaskAppSecret_2'
@@ -31,10 +26,10 @@ def handle_exception(e):
 def ping():
     return "pong"
 
-# Azure AD auth
-TENANT_ID = "bff06d89-48f9-41a6-b2e3-8910cfe1f722"
-CLIENT_ID = "119bbec8-fcfb-44dd-a211-33ce892cbfe1"
-CLIENT_SECRET = "lOT8Q~bYdojiEEEnWgi.F7dysdIzNgGktsKgtcUh"
+# Azure AD auth - Obteniendo valores desde App Settings (Variables de entorno)
+TENANT_ID = os.environ.get("TENANT_ID")
+CLIENT_ID = os.environ.get("CLIENT_ID")
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_URI = "https://myappservice1234-jmb.azurewebsites.net/getAToken"
 SCOPE = ["User.Read"]
