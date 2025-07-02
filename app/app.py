@@ -57,7 +57,10 @@ def get_blob_url_with_sas(blob_name):
 
 @app.route('/')
 def index():
-    return redirect(url_for('home'))
+    if 'user' in session:
+        return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/home')
 def home():
