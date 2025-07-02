@@ -9,7 +9,7 @@ from io import BytesIO
 app = Flask(__name__)
 app.secret_key = 'FlaskAppSecret_2'
 
-# 🔐 Azure AD config
+
 TENANT_ID = "bff06d89-48f9-41a6-b2e3-8910cfe1f722"
 CLIENT_ID = "119bbec8-fcfb-44dd-a211-33ce892cbfe1"
 CLIENT_SECRET = "lOT8Q~bYdojiEEEnWgi.F7dysdIzNgGktsKgtcUh"
@@ -17,13 +17,12 @@ AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_URI = "http://localhost:5000/getAToken"
 SCOPE = ["User.Read"]
 
-# 🔐 Azure Key Vault
 VAULT_URL = "https://pcloudkeyvaluejm25.vault.azure.net/"
 
 credential = DefaultAzureCredential()
 secret_client = SecretClient(vault_url=VAULT_URL, credential=credential)
 
-# ⛅ Blob Storage
+
 AZURE_CONNECTION_STRING = secret_client.get_secret("AzureBlobConnectionString").value
 CONTAINER_NAME = 'uploads'
 
