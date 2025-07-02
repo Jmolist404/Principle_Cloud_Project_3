@@ -7,6 +7,16 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from urllib.parse import quote
 
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.error(f"Unhandled Exception: {e}")
+    return "Internal Server Error", 500
+
 app = Flask(__name__)
 app.secret_key = 'FlaskAppSecret_2'
 
