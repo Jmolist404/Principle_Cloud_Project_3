@@ -1,13 +1,13 @@
 trigger:
-- master  # o la rama que uses
+- master
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: 'AzureStudentJordi'  # Tu Service Connection
-  appName: 'myappservice1234-jmb'        # Nombre del App Service
-  resourceGroup: 'rg-myapp'               # Resource Group donde está el App Service
+  azureSubscription: 'AzureForStudents'
+  appName: 'myappservice1234-jmb'
+  resourceGroup: 'rg-myapp'
 
 steps:
 - task: UsePythonVersion@0
@@ -16,18 +16,13 @@ steps:
     addToPath: true
 
 - script: |
-    python --version
-    where python
-  displayName: 'Check Python version and path'
-
-- script: |
     python -m pip install --upgrade pip
-    pip install -r app/requirements.txt  # Ruta si tenés requirements en carpeta app
+    pip install -r app/requirements.txt
   displayName: 'Instalar dependencias'
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: 'app'   # Carpeta donde está el código fuente
+    rootFolderOrFile: 'app'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/flask_app.zip'
@@ -36,6 +31,6 @@ steps:
 - task: AzureWebApp@1
   inputs:
     azureSubscription: $(azureSubscription)
-    appType: 'webApp'          # Windows App Service
+    appType: 'webApp'
     appName: $(appName)
     package: '$(Build.ArtifactStagingDirectory)/flask_app.zip'
