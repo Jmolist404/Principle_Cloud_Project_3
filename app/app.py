@@ -9,14 +9,20 @@ from urllib.parse import quote
 
 
 import logging
+from flask import Flask
+
+app = Flask(__name__)
 
 logging.basicConfig(level=logging.DEBUG)
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    app.logger.error(f"Unhandled Exception: {e}")
-    return "Internal Server Error", 500
+    app.logger.error(f"Unhandled Exception: {e}", exc_info=True)
 
+    return "Internal Server Error", 500
+@app.route('/ping')
+def ping():
+    return "pong"
 app = Flask(__name__)
 app.secret_key = 'FlaskAppSecret_2'
 
