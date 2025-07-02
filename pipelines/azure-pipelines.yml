@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: 'AzureStudentJordi'
+  azureSubscription: 'AzureForStudents'
   appName: 'myappservice1234-jmb'
   resourceGroup: 'rg-myapp'
 
