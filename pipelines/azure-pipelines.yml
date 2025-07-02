@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: 'AzureForStudents'
+  azureSubscription: 'AzureStudentJordi'
   appName: 'myappservice1234-jmb'
   resourceGroup: 'rg-myapp'
 
@@ -31,6 +31,6 @@ steps:
 - task: AzureWebApp@1
   inputs:
     azureSubscription: $(azureSubscription)
-    appType: 'webAppLinux'
+    appType: 'webApp'
     appName: $(appName)
     package: '$(Build.ArtifactStagingDirectory)/flask_app.zip'

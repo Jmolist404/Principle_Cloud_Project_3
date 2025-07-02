@@ -51,7 +51,6 @@
 							style="width: 500px; height: auto; margin: 0px;" />
 					</span>
 				</section>
-
 				<div id="carpetasContainer" style="margin-top: 20px;">
 					<h3>Files in Storage:</h3>
 					<div class="table-wrapper">
@@ -69,12 +68,32 @@
 								{% if files %}
 								{% for file in files %}
 								<tr>
-									<td>{{ file }}</td>
+									<td>{{ file.name }}</td>
 									<td>
-										<a href="{{ url_for('download_blob', blob_name=file) }}"
+										<!-- Botón de descarga -->
+										<a href="{{ url_for('download_blob', blob_name=file.name) }}"
 											class="button small">Download</a>
+
+										<!-- Botón 'Ver' para imágenes: usa ruta interna de Flask -->
+										{% if file.name.endswith('.jpg') or file.name.endswith('.jpeg') or
+										file.name.endswith('.png') or file.name.endswith('.gif') %}
+										<a href="{{ url_for('download_blob', blob_name=file.name) }}" target="_blank"
+											class="button small">Ver</a>
+										{% endif %}
 									</td>
 								</tr>
+
+								<!-- Vista previa embebida de imagen -->
+								{% if file.name.endswith('.jpg') or file.name.endswith('.jpeg') or
+								file.name.endswith('.png') or file.name.endswith('.gif') %}
+								<tr>
+									<td colspan="2" style="text-align:center;">
+										<img src="{{ url_for('download_blob', blob_name=file.name) }}"
+											alt="{{ file.name }}" style="max-width: 300px; margin: 10px auto;" />
+									</td>
+								</tr>
+								{% endif %}
+
 								{% endfor %}
 								{% else %}
 								<tr>
@@ -82,9 +101,13 @@
 								</tr>
 								{% endif %}
 							</tbody>
+
+
+
 						</table>
 					</div>
 				</div>
+
 
 				<!-- Section -->
 				<section>
