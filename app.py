@@ -13,6 +13,11 @@ from msal import ConfidentialClientApplication
 # Logging
 logging.basicConfig(level=logging.DEBUG)
 
+
+@app.route('/ping')
+def ping():
+    return "pong"
+
 # Flask App
 app = Flask(__name__)
 app.secret_key = 'FlaskAppSecret_2'
