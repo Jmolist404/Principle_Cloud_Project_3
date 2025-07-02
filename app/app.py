@@ -146,7 +146,7 @@ def authorized():
 def logout():
     session.clear()
     return redirect("https://login.microsoftonline.com/common/oauth2/v2.0/logout" +
-                    "?post_logout_redirect_uri=http://localhost:5000/")
+                "?post_logout_redirect_uri=https://myappservice1234-jmb.azurewebsites.net/")
 
 @app.route('/mydocuments')
 def mydocuments():
