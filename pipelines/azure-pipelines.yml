@@ -20,10 +20,6 @@ steps:
     pip install -r requirements.txt
   displayName: 'Instalar dependencias'
 
-# - script: |
-#     pytest tests/
-#   displayName: 'Ejecutar tests'
-
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
