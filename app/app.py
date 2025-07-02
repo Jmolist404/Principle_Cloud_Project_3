@@ -5,7 +5,6 @@ from azure.storage.blob import BlobServiceClient
 from msal import ConfidentialClientApplication
 
 from io import BytesIO
-import os
 
 app = Flask(__name__)
 app.secret_key = 'FlaskAppSecret_2'
@@ -19,12 +18,12 @@ REDIRECT_URI = "http://localhost:5000/getAToken"
 SCOPE = ["User.Read"]
 
 # 🔐 Azure Key Vault
-VAULT_URL =  "https://pcloudkeyvaluejm25.vault.azure.net/"  # << CAMBIÁ esto
+VAULT_URL = "https://pcloudkeyvaluejm25.vault.azure.net/"
 
 credential = DefaultAzureCredential()
 secret_client = SecretClient(vault_url=VAULT_URL, credential=credential)
 
-# ⛅ Blob Storage usando secreto de Key Vault
+# ⛅ Blob Storage
 AZURE_CONNECTION_STRING = secret_client.get_secret("AzureBlobConnectionString").value
 CONTAINER_NAME = 'uploads'
 
@@ -38,37 +37,19 @@ msal_app = ConfidentialClientApplication(
 )
 
 @app.route('/')
-def index():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    blobs = container_client.list_blobs()
-    files = [blob.name for blob in blobs]
-    return render_template('home.html', files=files, user=session['user'])
-
 @app.route('/home')
 def home():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template('home.html', user=session['user'])
 
-@app.route('/perfil')
-def perfil():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('perfil.html', user=session['user'])
+    try:
+        blobs_list = container_client.list_blobs()
+        blobs = [blob.name for blob in blobs_list]
+    except Exception as e:
+        print(f"Error al obtener blobs: {e}")
+        blobs = []
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    if not session.get("user"):
-        return redirect(url_for("login"))
-
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            blob_client = container_client.get_blob_client(file.filename)
-            blob_client.upload_blob(file.read(), overwrite=True)
-            return redirect(url_for('mydocuments'))
-    return render_template('upload.html', user=session["user"]["name"])
+    return render_template('home.html', user=session['user'], files=blobs)
 
 @app.route("/login")
 def login():
@@ -107,20 +88,18 @@ def mydocuments():
     except Exception as e:
         print(f"Error al obtener blobs: {e}")
         blobs = []
-
     return render_template('mydocuments.html', user=session['user'], blobs=blobs)
 
-@app.route('/news')
-def news():
+@app.route('/upload', methods=['POST'])
+def upload():
     if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('news.html', user=session['user'])
+        return redirect(url_for("login"))
 
-@app.route('/about')
-def about():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('about.html', user=session['user'])
+    file = request.files['file']
+    if file:
+        blob_client = container_client.get_blob_client(file.filename)
+        blob_client.upload_blob(file.read(), overwrite=True)
+    return redirect(url_for('home'))
 
 @app.route('/download/<path:blob_name>')
 def download_blob(blob_name):
@@ -134,6 +113,18 @@ def download_blob(blob_name):
     return send_file(BytesIO(file_data),
                      download_name=blob_name.split('/')[-1],
                      as_attachment=True)
+
+@app.route('/news')
+def news():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('news.html', user=session['user'])
+
+@app.route('/about')
+def about():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('about.html', user=session['user'])
 
 if __name__ == '__main__':
     app.run(debug=True)

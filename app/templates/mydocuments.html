@@ -38,22 +38,6 @@
 					</div>
 				</form>
 
-				<div id="carpetasContainer" style="margin-top: 20px;">
-					<h3>Archivos en Storage:</h3>
-					<ul>
-						{% if blobs %}
-							{% for blob in blobs %}
-							<li>
-								{{ blob }}
-								- <a href="{{ url_for('download_blob', blob_name=blob) }}">Descargar</a>
-							</li>
-							{% endfor %}
-						{% else %}
-							<li>No hay archivos</li>
-						{% endif %}
-					</ul>
-				</div>
-
 			</div>
 		</div>
 
@@ -118,11 +102,7 @@
 						</ul>
 					</section>
 
-					<!-- Footer -->
-					<footer id="footer">
-						<p class="copyright">&copy; Untitled. All rights reserved. Demo images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-					</footer>
-
+					
 			</div>
 		</div>
 
