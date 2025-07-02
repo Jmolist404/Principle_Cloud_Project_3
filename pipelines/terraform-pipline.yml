@@ -6,7 +6,7 @@ trigger:
 
 # Usamos una máquina virtual con Ubuntu para correr los comandos
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 # Variables que usamos en el pipeline
 variables:
